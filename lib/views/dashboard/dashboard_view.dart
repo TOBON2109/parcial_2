@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:skeletonizer/skeletonizer.dart';
+import 'package:shimmer/shimmer.dart';
 import '../../services/accidente_service.dart';
 import '../../services/establecimiento_service.dart';
 
@@ -43,24 +43,33 @@ class _DashboardViewState extends State<DashboardView> {
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
-            Skeletonizer(
-              enabled: _loading,
-              child: Row(
-                children: [
-                  _statCard(
-                    'Accidentes',
-                    '$_totalAccidentes',
-                    Icons.warning_amber,
+            _loading
+                ? Shimmer.fromColors(
+                    baseColor: Colors.grey[300]!,
+                    highlightColor: Colors.grey[100]!,
+                    child: Row(
+                      children: [
+                        Expanded(child: Card(child: SizedBox(height: 80))),
+                        const SizedBox(width: 12),
+                        Expanded(child: Card(child: SizedBox(height: 80))),
+                      ],
+                    ),
+                  )
+                : Row(
+                    children: [
+                      _statCard(
+                        'Accidentes',
+                        '$_totalAccidentes',
+                        Icons.warning_amber,
+                      ),
+                      const SizedBox(width: 12),
+                      _statCard(
+                        'Establecimientos',
+                        '$_totalEstablecimientos',
+                        Icons.store,
+                      ),
+                    ],
                   ),
-                  const SizedBox(width: 12),
-                  _statCard(
-                    'Establecimientos',
-                    '$_totalEstablecimientos',
-                    Icons.store,
-                  ),
-                ],
-              ),
-            ),
             const SizedBox(height: 24),
             _menuCard(
               'Estadísticas de Accidentes',
