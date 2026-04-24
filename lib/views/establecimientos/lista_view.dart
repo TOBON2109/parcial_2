@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:skeletonizer/skeletonizer.dart';
+import 'package:shimmer/shimmer.dart';
 import '../../models/establecimiento.dart';
 import '../../services/establecimiento_service.dart';
 
@@ -57,6 +57,7 @@ class _ListaViewState extends State<ListaView> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(_error!),
+                  const SizedBox(height: 12),
                   ElevatedButton(
                     onPressed: _cargar,
                     child: const Text('Reintentar'),
@@ -64,46 +65,52 @@ class _ListaViewState extends State<ListaView> {
                 ],
               ),
             )
-          : Skeletonizer(
-              enabled: _loading,
+          : _loading
+          ? Shimmer.fromColors(
+              baseColor: Colors.grey[300]!,
+              highlightColor: Colors.grey[100]!,
               child: ListView.builder(
-                itemCount: _loading ? 6 : _lista.length,
-                itemBuilder: (ctx, i) {
-                  final e = _loading
-                      ? Establecimiento(
-                          id: 0,
-                          nombre: 'Cargando...',
-                          nit: '0000',
-                          direccion: '---',
-                          telefono: '---',
-                        )
-                      : _lista[i];
-                  return ListTile(
-                    leading: e.logo != null
-                        ? Image.network(
-                            e.logo!,
-                            width: 48,
-                            height: 48,
-                            fit: BoxFit.cover,
-                            errorBuilder: (_, __, ___) =>
-                                const Icon(Icons.store),
-                          )
-                        : const Icon(Icons.store, size: 48),
-                    title: Text(e.nombre),
-                    subtitle: Text(
-                      'NIT: ${e.nit}\n${e.direccion}\n${e.telefono}',
-                    ),
-                    isThreeLine: true,
-                    onTap: () async {
-                      await context.pushNamed(
-                        'detalle',
-                        pathParameters: {'id': '${e.id}'},
-                      );
-                      _cargar();
-                    },
-                  );
-                },
+                itemCount: 6,
+                itemBuilder: (_, __) => ListTile(
+                  leading: Container(
+                    width: 48,
+                    height: 48,
+                    color: Colors.white,
+                  ),
+                  title: Container(height: 12, color: Colors.white),
+                  subtitle: Container(height: 10, color: Colors.white),
+                ),
               ),
+            )
+          : ListView.builder(
+              itemCount: _lista.length,
+              itemBuilder: (ctx, i) {
+                final e = _lista[i];
+                return ListTile(
+                  leading: e.logo != null
+                      ? Image.network(
+                          e.logo!,
+                          width: 48,
+                          height: 48,
+                          fit: BoxFit.cover,
+                          errorBuilder: (_, __, ___) =>
+                              const Icon(Icons.store, size: 48),
+                        )
+                      : const Icon(Icons.store, size: 48),
+                  title: Text(e.nombre),
+                  subtitle: Text(
+                    'NIT: ${e.nit}\n${e.direccion}\n${e.telefono}',
+                  ),
+                  isThreeLine: true,
+                  onTap: () async {
+                    await context.pushNamed(
+                      'detalle',
+                      pathParameters: {'id': '${e.id}'},
+                    );
+                    _cargar();
+                  },
+                );
+              },
             ),
     );
   }
